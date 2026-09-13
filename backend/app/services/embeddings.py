@@ -1,6 +1,7 @@
 """Transcript chunking, sentence-transformers embeddings and the ChromaDB store."""
 
 import logging
+import os
 from dataclasses import dataclass
 from typing import Sequence
 
@@ -88,6 +89,9 @@ class EmbeddingService:
     def _get_collection(self):
         if self._collection is not None:
             return self._collection
+        # Must be set before chromadb is imported: its telemetry client is built at
+        # import time. MeetingAI makes no outbound calls.
+        os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
         try:
             import chromadb
         except ImportError as exc:  # pragma: no cover
@@ -95,7 +99,11 @@ class EmbeddingService:
                 "chromadb is not installed. Run: pip install -r requirements.txt"
             ) from exc
         try:
-            client = chromadb.PersistentClient(path=str(self.settings.chroma_dir))
+            # Telemetry is disabled so the application makes no outbound calls at all.
+            client = chromadb.PersistentClient(
+                path=str(self.settings.chroma_dir),
+                settings=chromadb.config.Settings(anonymized_telemetry=False),
+            )
             self._collection = client.get_or_create_collection(
                 name=self.settings.chroma_collection,
                 metadata={"hnsw:space": "cosine"},

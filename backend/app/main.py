@@ -22,6 +22,10 @@ def configure_logging(level: str) -> None:
         level=getattr(logging, level.upper(), logging.INFO),
         format="%(asctime)s %(levelname)-8s %(name)s: %(message)s",
     )
+    # ChromaDB's telemetry is switched off in EmbeddingService, but its shipped
+    # posthog wrapper still logs a failed-send error for each event. Nothing is
+    # transmitted; silence the noise.
+    logging.getLogger("chromadb.telemetry").setLevel(logging.CRITICAL)
 
 
 @asynccontextmanager
