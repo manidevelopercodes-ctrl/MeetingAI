@@ -1,0 +1,1 @@
+"""MeetingAI backend application package."""

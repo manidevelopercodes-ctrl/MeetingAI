@@ -1,0 +1,40 @@
+# Optional. Local Windows development is the primary setup - see the README.
+#
+# This file containerises only the MeetingAI backend. Ollama is intentionally NOT
+# containerised: running it natively keeps GPU access and model management simple,
+# and it is usually already installed on the host. The backend reaches the host
+# Ollama through host.docker.internal.
+#
+#   docker compose up --build
+#
+# The frontend is not containerised either; run `npm run dev` on the host.
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: meetingai-backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: sqlite:////data/meetingai.db
+      WHISPER_MODEL: ${WHISPER_MODEL:-small}
+      WHISPER_DEVICE: cpu
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
+      EMBEDDING_MODEL: all-MiniLM-L6-v2
+      MAX_UPLOAD_SIZE_MB: 200
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+    volumes:
+      - ./storage:/app/storage
+      - ./data:/app/data
+      - meetingai-db:/data
+      - meetingai-models:/root/.cache
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+volumes:
+  meetingai-db:
+  meetingai-models:

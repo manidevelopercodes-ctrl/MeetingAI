@@ -1,0 +1,31 @@
+from app.schemas.meeting import (
+    ActionItem,
+    ChatRequest,
+    ChatResponse,
+    ChatSource,
+    HealthResponse,
+    MeetingCreate,
+    MeetingRead,
+    SearchHit,
+    SearchResponse,
+    SummaryPayload,
+    SummaryRead,
+    TranscriptResponse,
+    TranscriptSegmentRead,
+)
+
+__all__ = [
+    "ActionItem",
+    "ChatRequest",
+    "ChatResponse",
+    "ChatSource",
+    "HealthResponse",
+    "MeetingCreate",
+    "MeetingRead",
+    "SearchHit",
+    "SearchResponse",
+    "SummaryPayload",
+    "SummaryRead",
+    "TranscriptResponse",
+    "TranscriptSegmentRead",
+]
